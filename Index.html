@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday Shivuuu!</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom right, #ffc0cb, #ffe4e1);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      color: #d63384;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 30px;
+      font-size: 2em;
+    }
+
+    .cake {
+      position: relative;
+      width: 300px;
+      height: 200px;
+      margin: 100px auto 20px;
+      background: pink;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .cake::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 50px;
+      background: hotpink;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .candle {
+      position: absolute;
+      bottom: 100%;
+      width: 6px;
+      height: 30px;
+      background: #fff;
+      border-radius: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: flicker 1s infinite;
+    }
+
+    .flame {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 15px;
+      background: gold;
+      border-radius: 50% 50% 50% 50%;
+      box-shadow: 0 0 10px 4px gold;
+    }
+
+    @keyframes flicker {
+      0% { transform: translateX(-50%) scaleY(1); }
+      50% { transform: translateX(-50%) scaleY(1.2); }
+      100% { transform: translateX(-50%) scaleY(1); }
+    }
+
+    .message {
+      display: none;
+      margin-top: 50px;
+      font-size: 1.5em;
+      padding: 20px;
+      background-color: #ffb6c1;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(255,105,180, 0.5);
+      max-width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #instruction {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #d63384;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: hotpink;
+      animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-100px) rotate(0deg); }
+      100% { transform: translateY(100vh) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Happy Birthday Shivuuu!</h1>
+  <div class="cake" id="cake"></div>
+  <div id="instruction">Blow out the candles by blowing into your microphone!</div>
+  <div class="message" id="message">
+    May your special day be surrounded with happiness, filled with laughter, wrapped in pleasure, brightened with fun, blessed with love, remembered with joy, and enriched with hopes.🤗<br><br>
+    <strong>Happy Birthday Shivuuu!</strong>
+  </div>
+  <canvas class="confetti" id="confettiCanvas"></canvas>
+
+  <script>
+    const cake = document.getElementById('cake');
+    const instruction = document.getElementById('instruction');
+    const message = document.getElementById('message');
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const ctx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+
+    const candleCount = 10;
+    let blownOut = 0;
+
+    function makeCandles() {
+      for (let i = 0; i < candleCount; i++) {
+        const candle = document.createElement('div');
+        candle.className = 'candle';
+        candle.style.left = `${20 + i * 25}px`;
+
+        const flame = document.createElement('div');
+        flame.className = 'flame';
+        candle.appendChild(flame);
+
+        cake.appendChild(candle);
+      }
+    }
+
+    function blowOutCandle(candle) {
+      const flame = candle.querySelector('.flame');
+      if (flame && flame.style.display !== 'none') {
+        flame.style.display = 'none';
+        blownOut++;
+        if (blownOut >= candleCount) {
+          instruction.remove();
+          showMessage();
+          launchConfetti();
+        }
+      }
+    }
+
+    function showMessage() {
+      message.style.display = 'block';
+    }
+
+    function launchConfetti() {
+      const pieces = [];
+      for (let i = 0; i < 150; i++) {
+        pieces.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * -confettiCanvas.height,
+          speed: Math.random() * 5 + 2,
+          size: Math.random() * 8 + 4,
+          color: `hsl(${Math.random() * 360}, 100%, 80%)`,
+          rotation: Math.random() * 360
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        for (let p of pieces) {
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.size, p.size);
+          p.y += p.speed;
+          p.rotation += 5;
+          if (p.y > confettiCanvas.height) p.y = -10;
+        }
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    }
+
+    function listenToMic() {
+      navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const mic = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        mic.connect(analyser);
+        analyser.fftSize = 256;
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        function detectBlow() {
+          analyser.getByteFrequencyData(dataArray);
+          const volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+          if (volume > 40) { // adjust sensitivity
+            const candles = document.querySelectorAll('.candle');
+            for (let candle of candles) {
+              blowOutCandle(candle);
+            }
+          }
+          requestAnimationFrame(detectBlow);
+        }
+
+        detectBlow();
+      });
+    }
+
+    makeCandles();
+    listenToMic();
+  </script>
+</body>
+</html>
+
