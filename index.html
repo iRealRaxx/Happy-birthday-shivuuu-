@@ -212,7 +212,7 @@
         function detectBlow() {
           analyser.getByteFrequencyData(dataArray);
           const volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-          if (volume > 20) { // adjust sensitivity
+          if (volume > 30) { // adjust sensitivity
             const candles = document.querySelectorAll('.candle');
             for (let candle of candles) {
               blowOutCandle(candle);
